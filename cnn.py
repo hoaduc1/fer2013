@@ -33,22 +33,63 @@ x_train -= np.mean(x_train, axis=0)
 x_train /= np.std(x_train, axis=0)
 
 # create model
+num_features = 64
+num_labels = 7
+batch_size = 64
+epochs = 100
+width, height = 48, 48
 model = Sequential()
-model.add(Conv2D(32, (3, 3), input_shape=(48, 48, 1), activation='relu', data_format='channels_last', kernel_regularizer=l2(0.01)))
+
+model.add(Conv2D(num_features, kernel_size=(3, 3), activation='relu', input_shape=(width, height, 1), data_format='channels_last', kernel_regularizer=l2(0.01)))
+model.add(Conv2D(num_features, kernel_size=(3, 3), activation='relu', padding='same'))
 model.add(BatchNormalization())
-model.add(Conv2D(16, (3, 3), activation='relu'))
-model.add(MaxPooling2D())
-model.add(Dropout(0.2))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Conv2D(2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(Conv2D(2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+model.add(Dropout(0.5))
+
+model.add(Conv2D(2*2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(Conv2D(2*2*2*num_features, kernel_size=(3, 3), activation='relu', padding='same'))
+model.add(BatchNormalization())
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+model.add(Dropout(0.5))
 
 model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(64, activation='relu'))
-model.add(Dropout(0.2))
-model.add(Dense(7, activation='softmax'))
 
-model.compile(optimizer=Adam(lr=0.001), loss=mean_squared_error, metrics=['accuracy'])
-history = model.fit(x_train, y_train, batch_size=100, epochs=20, validation_data=(x_test, y_test), shuffle=True)
+model.add(Dense(2*2*2*num_features, activation='relu'))
+model.add(Dropout(0.4))
+model.add(Dense(2*2*num_features, activation='relu'))
+model.add(Dropout(0.4))
+model.add(Dense(2*num_features, activation='relu'))
+model.add(Dropout(0.5))
+
+model.add(Dense(num_labels, activation='softmax'))
+
+#Compliling the model with adam optimixer and categorical crossentropy loss
+model.compile(loss=categorical_crossentropy,
+              optimizer=Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-7),
+              metrics=['accuracy'])
+
+#training the model
+history = model.fit(np.array(x_train), np.array(y_train),
+          batch_size=batch_size,
+          epochs=epochs,
+          verbose=1,
+          validation_data=(np.array(x_test), np.array(y_test)),
+          shuffle=True)
 
 plot_training_history(history)
 	
