@@ -11,7 +11,7 @@ import numpy as np
 from utils import load_data, plot_dataset, plot_training_history
 
 # read dataset and split it into input set and labels set
-x_train, y_train = load_data();
+x_train, y_train = load_data()
 print(x_train.shape)
 print(y_train.shape)
 
@@ -46,7 +46,7 @@ model.add(Dense(50, activation='relu'))
 model.add(Dropout(0.4))
 model.add(Dense(7, activation='softmax'))
 
-model.compile(optimizer=Adam(lr=0.001), loss=categorical_crossentropy, metrics=['accuracy'])
+model.compile(optimizer=Adam(lr=0.001), loss=mean_squared_error, metrics=['accuracy'])
 history = model.fit(x_train, y_train, batch_size=100, epochs=20, validation_data=(x_test, y_test))
 
 plot_training_history(history)
