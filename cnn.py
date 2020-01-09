@@ -14,7 +14,10 @@ from utils import load_data, plot_dataset, plot_training_history
 x_train, y_train = load_data();
 print(x_train.shape)
 print(y_train.shape)
-
+''' fdsfdfffdf
+ffdfdfdff
+ffdfdff
+'''''
 # plot the dataset
 #plot_dataset(x_train, y_train)
 
